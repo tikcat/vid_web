@@ -1,0 +1,106 @@
+name: vid_web
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+#environment:
+#  sdk: ^3.6.0
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  easy_localization: ^3.0.7
+  provider: ^6.1.2
+  fluttertoast: ^8.0.0
+  fluro: ^2.0.5
+  mobx: ^2.3.3+2
+  cupertino_icons: ^1.0.8
+  flutter_mobx: ^2.2.1+1
+  shared_preferences: ^2.2.3
+  flutter_svg: ^2.0.9
+  cloud_firestore: ^5.4.0
+  firebase_core: ^3.4.0
+  google_sign_in: ^6.2.2
+  googleapis: ^13.1.0
+  http: ^0.13.6
+  googleapis_auth: ^1.4.1
+  json_annotation: ^4.9.0
+  json_serializable: ^6.8.0
+  firebase_auth: ^5.3.4
+  firebase_analytics: ^11.3.6
+  logger: ^2.4.0
+  visibility_detector: ^0.4.0+2
+  shimmer: ^3.0.0
+  cached_network_image: ^3.3.1
+  uuid: ^4.5.1
+  intl_phone_number_input: ^0.7.4
+  permission_handler: ^11.3.1
+  path_provider: ^2.0.9
+  flutter_smart_dialog: ^4.9.8+5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.0.0
+  mobx_codegen: ^2.0.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Roboto-Light
+      fonts:
+        - asset: assets/fonts/Roboto-Light.ttf
+          weight: 300
+    - family: Roboto-Regular
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+          weight: 400
+    - family: Roboto-Medium
+      fonts:
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+    - family: Roboto-Bold
+      fonts:
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+    - family: Roboto-Black
+      fonts:
+        - asset: assets/fonts/Roboto-Black.ttf
+          weight: 900
+
+  assets:
+    - assets/data/home_short.json
+    - assets/data/cartoon.json
+    - assets/data/movie.json
+    - assets/data/travel.json
+    - assets/data/series.json
+    - assets/data/dramas.json
+    # assets-generator-begin
+    # assets/images/*
+    - assets/images/add.png
+    - assets/images/visible.png
+    - assets/images/clear.png
+    - assets/images/cancel.png
+    - assets/images/firebase.png
+    - assets/images/logout.png
+    - assets/images/reset.png
+    - assets/images/google_drive.png
+    - assets/images/invisible.png
+    - assets/images/dailymotion.png
+    - assets/images/checkbook.png
+    - assets/images/back.png
+    # assets-generator-end

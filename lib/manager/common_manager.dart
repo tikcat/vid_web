@@ -8,7 +8,6 @@ import '../data/user_info.dart';
 
 class CommonManager {
 
-  static const String currentLanguageCodeKey = "current_language";
   static const String starCodeKey = "star_code";
   static const String isBeepKey = "open_beep";
   static const String isVibrationKey = "open_vibration";
@@ -17,6 +16,17 @@ class CommonManager {
   static const String firebaseUserIdKey = "firebase_uid";
   static const String autoUploadKey = "auto_upload";
   static const String userInfoKey = "user_info";
+
+  /// 存储登录的数据
+  static const String loginDataKey = "login_data_key";
+
+  static Future<String?> getLoginData() async {
+    return await SpUtil.getStringData(loginDataKey);
+  }
+
+  static Future<void> saveLoginData(String loginJson) async {
+    SpUtil.saveStringData(userInfoKey, loginJson);
+  }
 
   static Future<bool?> getAutoUpload() async {
     return await SpUtil.getBoolData(autoUploadKey);

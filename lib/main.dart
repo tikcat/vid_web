@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         FlutterSmartDialog.observer,
       ],
       builder: FlutterSmartDialog.init(),
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       onGenerateRoute: _router.generator,
     );
   }

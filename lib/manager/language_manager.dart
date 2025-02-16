@@ -2,8 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:vid_web/data/support_language_data.dart';
-import 'package:vid_web/manager/common_manager.dart';
-import 'package:vid_web/util/sp_util.dart';
 
 class LanguageManager {
 
@@ -214,21 +212,6 @@ class LanguageManager {
       default:
         return const Locale('en', 'US');
     }
-  }
-
-  static void applyLocale(BuildContext context, String localeNameCode) {
-    final locale = codeToLocale(localeNameCode);
-    SpUtil.saveStringData(CommonManager.currentLanguageCodeKey, localeNameCode);
-    context.setLocale(locale);
-  }
-
-  static Future<bool> isSameCurrentLanguage(String targetLanguage) async {
-    final currentLanguage = await SpUtil.getStringData(CommonManager.currentLanguageCodeKey);
-    return currentLanguage == targetLanguage;
-  }
-
-  static Future<String?> getLocalLanguageCode() async {
-    return await SpUtil.getStringData(CommonManager.currentLanguageCodeKey);
   }
 
   /// 获取当前系统语言

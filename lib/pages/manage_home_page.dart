@@ -328,7 +328,7 @@ class _ManageHomePageState extends State<ManageHomePage> {
         videoDataStore.updateCurrentUserAccount(manageUser.googleAccount);
       },
       child: Observer(builder: (_) {
-        mLogger.d("更新选中的用户:${videoDataStore.currentUserAccount}");
+        debugPrint("更新选中的用户:${videoDataStore.currentUserAccount}");
 
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
@@ -385,88 +385,12 @@ class _ManageHomePageState extends State<ManageHomePage> {
             ToastUtil.showToast("请填写登陆账户和密码");
             return;
           }
-          // _loginGoogle();
-          User? user = await signInWithGoogle();
-          if (user != null) {
-            print("Logged in as ${user.displayName}");
-            // 登录成功后的处理
-            if (context.mounted) {
-              Routes.router.navigateTo(context, Routes.dailymotionPagePath);
-            }
-          } else {
-            print("Google sign-in failed");
-            if (context.mounted) {
-              Routes.router.navigateTo(context, Routes.notFoundPath);
-            }
-          }
+          _loginGoogle();
         },
         child: Text("登陆", style: MyTextStyle.textStyle500Weight(MyColor.whiteColor, fontSize: 15)),
       ),
     );
   }
-
-  /*
-  登录
-   */
-  final GoogleSignIn googleSignIn = GoogleSignIn();
-
-  Future<User?> signInWithGoogle() async {
-    try {
-      // 触发 Google 登录流程
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      print("登录 11 ");
-      if (googleUser == null) {
-        // 用户取消了登录
-        return null;
-      }
-      print("登录 22 ");
-      // 获取 Google 登录凭证
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      print("登录 33 ");
-      // 使用 Firebase 身份验证进行登录
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      print("登录 44 ");
-      // 使用凭证进行 Firebase 登录
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      print("登录 55 ");
-      return userCredential.user;
-    } catch (e) {
-      print("Error during Google sign-in: $e");
-      return null;
-    }
-  }
-
-  // final GoogleSignIn _googleSignIn = GoogleSignIn(
-  //   clientId: '997863883560-0rlhh2h7l33p9lfsov6a703nn0e3r7nb.apps.googleusercontent.com',
-  //   scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-  // );
-  //
-  // Future<void> signInWithGoogle() async {
-  //   try {
-  //     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-  //     debugPrint("登录的数据  email:${googleUser?.email} - username:${googleUser?.displayName}");
-  //     if (googleUser == null) {
-  //       return; // 用户取消了登录
-  //     }
-  //
-  //     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  //     debugPrint("登录认证的数据  accessToken:${googleAuth.accessToken} - idToken:${googleAuth.idToken}");
-  //     // 使用 Firebase 进行认证
-  //     final credential = GoogleAuthProvider.credential(
-  //       accessToken: googleAuth.accessToken,
-  //       idToken: googleAuth.idToken,
-  //     );
-  //
-  //     // Firebase 登录
-  //     final res = await FirebaseAuth.instance.signInWithCredential(credential);
-  //     debugPrint("登录的结果  email:${res.user?.email} - username:${res.additionalUserInfo?.username} - accessToken:${res.credential?.accessToken}");
-  //   } catch (e) {
-  //     debugPrint("Error during Google sign-in: $e");
-  //   }
-  // }
 
   void execLogin(BuildContext context, LoginFirebaseCallback loginFirebaseCallback) async {
     mLogger.d("执行登陆 数据  _email:${_emailController?.text} - password:${_passwordController?.text}");

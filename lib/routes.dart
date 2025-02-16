@@ -4,9 +4,11 @@ import 'package:vid_web/data/video_file_data.dart';
 import 'package:vid_web/data/web_page_data.dart';
 import 'package:vid_web/enum/home_list_block.dart';
 import 'package:vid_web/pages/dailymotion_page.dart';
-import 'package:vid_web/pages/manage_home_page.dart';
+import 'package:vid_web/pages/home_page.dart';
+import 'package:vid_web/pages/login_page.dart';
 import 'package:vid_web/pages/manage_settings_page.dart';
 import 'package:vid_web/pages/not_found_page.dart';
+import 'package:vid_web/pages/splash_page.dart';
 
 class Routes {
   static final FluroRouter router = FluroRouter();
@@ -15,6 +17,7 @@ class Routes {
   static const String rootPath = "/";
   static const String notFoundPath = "/not_found";
   static const String loginPath = "/login";
+  static const String homePath = "/home";
   static const String shortDetailPath = "/short_detail_page";
   static const String appWebPath = "/app_web_path";
   static const String settingPath = "/setting_page";
@@ -31,7 +34,17 @@ class Routes {
       router.define(
         rootPath,
         transitionType: TransitionType.inFromRight,
-        handler: Handler(handlerFunc: (context, parameters) => const ManageHomePage()),
+        handler: Handler(handlerFunc: (context, parameters) => const SplashPage()),
+      );
+      router.define(
+        loginPath,
+        transitionType: TransitionType.inFromRight,
+        handler: Handler(handlerFunc: (context, parameters) => const LoginPage()),
+      );
+      router.define(
+        homePath,
+        transitionType: TransitionType.inFromRight,
+        handler: Handler(handlerFunc: (context, parameters) => const HomePage()),
       );
       router.define(
         notFoundPath,

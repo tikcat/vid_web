@@ -1,3 +1,4 @@
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobx/mobx.dart';
 import 'package:vid_web/data/video_file_data.dart';
 import 'package:vid_web/enum/home_list_block.dart';
@@ -8,6 +9,33 @@ class DailymotionPageStore = _DailymotionPageStore with _$DailymotionPageStore;
 
 abstract class _DailymotionPageStore with Store {
 
+  @observable
+  GoogleSignInAccount? googleUser;
+
+  @action
+  void setGoogleUser(GoogleSignInAccount? googleUser) {
+    this.googleUser = googleUser;
+  }
+
+  /// 该集的名称
+  @observable
+  String name = "";
+
+  @action
+  void setName(String name) {
+    this.name = name;
+  }
+
+  /// 剧名
+  @observable
+  String playName = "";
+
+  @action
+  void setPlayName(String playName) {
+    this.playName = playName;
+  }
+
+  /// 封面名称
   @observable
   String videoCoverName = "";
 

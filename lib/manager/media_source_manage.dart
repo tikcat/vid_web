@@ -1,4 +1,5 @@
 import 'package:vid_web/enum/home_list_block.dart';
+import 'package:vid_web/enum/support_vid_platform.dart';
 
 class MediaSourceManage {
 
@@ -73,6 +74,15 @@ class MediaSourceManage {
     HomeListBlock.cartoon,
     HomeListBlock.documentary,
     HomeListBlock.music,
+  ];
+
+  /// 上传视频支持的平台
+  static const List<SupportVidPlatform> supportVidPlatformList = [
+    SupportVidPlatform.dailymotion,
+    SupportVidPlatform.youtube,
+    SupportVidPlatform.bilibili,
+    SupportVidPlatform.tiktok,
+    SupportVidPlatform.vimeo,
   ];
 
 }

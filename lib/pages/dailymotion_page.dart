@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:vid_web/constant/my_color.dart';
 import 'package:vid_web/data/video_file_data.dart';
@@ -13,15 +12,15 @@ import 'package:vid_web/dialog/my_dialog.dart';
 import 'package:vid_web/enum/home_list_block.dart';
 import 'package:vid_web/manager/fire_store_manager.dart';
 import 'package:vid_web/manager/google_drive_service.dart';
-import 'package:vid_web/manager/google_sign_in_provider.dart';
+import 'package:vid_web/manager/upload_file_manager.dart';
 import 'package:vid_web/r.dart';
 import 'package:vid_web/size.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:vid_web/store/dailymotion_page_store.dart';
 import 'package:vid_web/text_style.dart';
 import 'package:vid_web/util/image_loader.dart';
 import 'package:vid_web/util/my_logger.dart';
 import 'package:vid_web/util/toast_util.dart';
+import 'package:vid_web/widget/drag_and_drop_widget.dart';
 import 'package:vid_web/widget/qr_app_bar.dart';
 
 class UploadVideoFileToDailymotionPage extends StatefulWidget {
@@ -33,8 +32,8 @@ class UploadVideoFileToDailymotionPage extends StatefulWidget {
 
 class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDailymotionPage> {
   final GoogleDriveService _googleDriveService = GoogleDriveService();
+  final UploadFileManager _uploadFileManager = UploadFileManager();
   TextEditingController? _videoLinkController;
-  TextEditingController? _videoCoverController;
   TextEditingController? _videoIntroController;
   late DailymotionPageStore _dailymotionPageStore;
   late Map<String, dynamic> _data;
@@ -43,10 +42,7 @@ class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDail
   void initState() {
     super.initState();
     _videoLinkController = TextEditingController();
-    _videoCoverController = TextEditingController();
     _videoIntroController = TextEditingController();
-
-    _requestPermissions();
   }
 
   @override
@@ -65,18 +61,8 @@ class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDail
     _dailymotionPageStore.updateVideoCoverName("");
     _dailymotionPageStore.updateProgress(0.0);
     _videoLinkController?.dispose();
-    _videoCoverController?.dispose();
     _videoIntroController?.dispose();
     super.dispose();
-  }
-
-  // 请求存储权限
-  Future<void> _requestPermissions() async {
-    if (await Permission.storage.request().isGranted) {
-      _loadJsonData();
-    } else {
-      mLogger.d("权限被拒绝");
-    }
   }
 
   Future<void> _readAssetsJson() async {
@@ -116,40 +102,9 @@ class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDail
     }
   }
 
-  // 读取 Documents 文件夹下的 JSON 文件
-  Future<void> _loadJsonData() async {
-    // 获取存储路径
-    final directory = await getExternalStorageDirectory();
-    if (directory == null) return;
-
-    // 获取指定文件夹下的文件路径
-    final folderPath = "${directory.path}/Documents"; // 假设你的JSON文件在 Documents 文件夹下
-    final folder = Directory(folderPath);
-
-    // 检查文件夹是否存在
-    if (await folder.exists()) {
-      // 获取文件夹下所有文件
-      final files = folder.listSync();
-      for (var file in files) {
-        if (file.path.endsWith('.json')) {
-          // 检查是否是 .json 文件
-          String content = await File(file.path).readAsString();
-          // 解析 JSON 数据
-          var jsonData = jsonDecode(content);
-          setState(() {
-            _data = jsonData; // 假设JSON文件的内容是列表格式
-          });
-        }
-      }
-    } else {
-      mLogger.e("文件夹不存在");
-    }
-  }
-
   /// 查询封面
-  Future<void> _readVideoFileList(String videoCoverName) async {
-    final user = GoogleSignInProvider.instance.user;
-    if (user == null) {
+  Future<void> _readVideoCover(String videoCoverName) async {
+    if (_dailymotionPageStore.googleUser == null) {
       ToastUtil.showToast("用户未登录");
       return;
     }
@@ -158,11 +113,15 @@ class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDail
       return;
     }
     _dailymotionPageStore.updateVideoCoverQuerying(true);
-    final videoCoverFile = await _googleDriveService.findFileByNameInFolder(user,
-        folderName: _dailymotionPageStore.currentVideoType!.collectionName, fileName: videoCoverName);
+    final videoCoverFile = await _googleDriveService.findFileByNameInFolder(
+      _dailymotionPageStore.googleUser!,
+      folderName: _dailymotionPageStore.currentVideoType!.collectionName,
+      fileName: videoCoverName,
+    );
     if (videoCoverFile != null) {
       if (videoCoverFile.mimeType!.startsWith('image/')) {
         final videoCover = _googleDriveService.getDriveImageUrl(videoCoverFile) ?? "";
+        debugPrint("封面地址 - videoCover:$videoCover");
         _dailymotionPageStore.updateVideoCoverUrl(videoCover);
         _dailymotionPageStore.updateDocumentId(videoCoverFile.id ?? "");
         _dailymotionPageStore.updateShowReadVideoJson(true);
@@ -178,6 +137,7 @@ class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDail
     _dailymotionPageStore = Provider.of<DailymotionPageStore>(context);
 
     return Scaffold(
+      backgroundColor: MyColor.whiteColor,
       appBar: QRAppBar(
         appbarHeight: 90,
         leftWidgetMargin: 10,
@@ -206,37 +166,11 @@ class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDail
           child: Column(
             children: [
               _buildConfigWidget(context),
-              Row(
-                children: [
-                  _buildCoverTextField(),
-                  w8,
-                  Observer(builder: (_) {
-                    return ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: MyColor.primaryColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                        ),
-                        onPressed: () {
-                          if (_dailymotionPageStore.currentVideoType?.type == HomeListBlock.homeShort.type) {
-                            _readVideoFileList(_dailymotionPageStore.videoCoverName);
-                          } else {
-                            if (_dailymotionPageStore.videoCoverName.isEmpty) {
-                              ToastUtil.showToast("请填写封面名称");
-                              return;
-                            }
-                            _readVideoFileList(_dailymotionPageStore.videoCoverName);
-                          }
-                        },
-                        child: _dailymotionPageStore.videoCoverQuerying
-                            ? SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: MyColor.whiteColor),
-                              )
-                            : Text("查询", style: MyTextStyle.textStyle500Weight(MyColor.whiteColor, fontSize: 14)));
-                  }),
-                ],
-              ),
+              h20,
+              _buildPicFileButton(),
+              h20,
+              DragAndDropWidget(),
+              h20,
               _buildReadVideoSourceButton(),
               _buildUploadButton(context),
             ],
@@ -250,6 +184,31 @@ class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDail
     return Row(
       children: [
         w10,
+        Observer(builder: (_) {
+          return ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: MyColor.primaryColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+              ),
+              onPressed: () {
+                if (_dailymotionPageStore.currentVideoType?.type == HomeListBlock.homeShort.type) {
+                  _readVideoCover(_dailymotionPageStore.videoCoverName);
+                } else {
+                  if (_dailymotionPageStore.videoCoverName.isEmpty) {
+                    ToastUtil.showToast("请填写封面名称");
+                    return;
+                  }
+                  _readVideoCover(_dailymotionPageStore.videoCoverName);
+                }
+              },
+              child: _dailymotionPageStore.videoCoverQuerying
+                  ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: MyColor.whiteColor),
+              )
+                  : Text("查询", style: MyTextStyle.textStyle500Weight(MyColor.whiteColor, fontSize: 14)));
+        }),
         Observer(builder: (_) {
           return Visibility(
             visible: _dailymotionPageStore.videoCoverUrl.isNotEmpty,
@@ -393,34 +352,54 @@ class _UploadVideoFileToDailymotionPageState extends State<UploadVideoFileToDail
     );
   }
 
-  Widget _buildCoverTextField() {
-    return Observer(builder: (_) {
-      _videoCoverController?.text = _dailymotionPageStore.videoCoverName;
-      return Expanded(
-        child: TextField(
-          controller: _videoCoverController,
-          style: MyTextStyle.textStyle500Weight(MyColor.blackColor, fontSize: 14),
-          decoration: InputDecoration(
-            labelText: '请填写视频封面名称',
-            suffixIcon: _dailymotionPageStore.videoCoverName.isNotEmpty
-                ? InkWell(
-                    onTap: () {
-                      _videoCoverController?.clear();
-                      _dailymotionPageStore.updateVideoCoverName("");
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 20, left: 12, right: 12, bottom: 4),
-                      child: ImageLoader.loadIcon(R.assetsImagesClear, iconColor: MyColor.blackColor, size: 8),
-                    ),
-                  )
-                : null,
-          ),
-          onChanged: (_) {
-            _dailymotionPageStore.updateVideoCoverName(_videoCoverController?.text ?? "");
-          },
-        ),
-      );
-    });
+  Widget _buildPicFileButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: MyColor.primaryColor,
+        minimumSize: Size(150, 42),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      ),
+      onPressed: () async {
+        _uploadFileManager.pickFile((file) async {
+          if (file != null) {
+            final reader = html.FileReader();
+            debugPrint("读取的文件 path:${file.path} - name:${file.name}");
+            reader.readAsText(html.File([file.bytes!], file.name));
+            // 监听文件读取完成
+            reader.onLoadEnd.listen((e) {
+              String jsonString = reader.result as String;
+              debugPrint("读取的 JSON 内容: $jsonString");
+
+              try {
+                // 解析 JSON 字符串
+                Map<String, dynamic> videoFileMap = jsonDecode(jsonString);
+                _dailymotionPageStore.setName(videoFileMap['name']);
+                _dailymotionPageStore.setPlayName(videoFileMap['playName']);
+                final videoCoverName = videoFileMap['coverName'];
+                _dailymotionPageStore.updateVideoCover(videoCoverName);
+                final videoList = videoFileMap["videos"];
+                debugPrint("videoList: $videoList");
+                if (videoList.isNotEmpty) {
+                  List<VideoFileData> videoFileDataList = [];
+                  for (final video in videoList) {
+                    final videoFileData = VideoFileData.fromMap(video);
+                    videoFileDataList.add(videoFileData);
+                  }
+                  _dailymotionPageStore.updateVideoFileDataList(videoFileDataList);
+                  _dailymotionPageStore.updateShowUploadVideo(true);
+                }
+                _readVideoCover(videoCoverName);
+              } catch (e) {
+                debugPrint('错误: 无法解析 JSON 文件, 错误信息: $e');
+              }
+            });
+          } else {
+            ToastUtil.showToast("请重新选择Json文件");
+          }
+        });
+      },
+      child: Text("选择文件", style: MyTextStyle.textStyle500Weight(MyColor.whiteColor, fontSize: 15)),
+    );
   }
 
   Widget _buildReadVideoSourceButton() {

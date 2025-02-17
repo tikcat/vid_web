@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:uuid/uuid.dart';
+import 'package:vid_web/data/login_account_data.dart';
+import 'package:vid_web/data/login_account_list_data.dart';
 import 'package:vid_web/util/sp_util.dart';
 
 import '../data/user_info.dart';
@@ -19,6 +21,30 @@ class CommonManager {
 
   /// 存储登录的数据
   static const String loginDataKey = "login_data_key";
+  static const String loginAccountsDataKey = "login_accounts_data_key";
+
+  static Future<String?> getLoginAccountsData() async {
+    return await SpUtil.getStringData(loginAccountsDataKey);
+  }
+
+  static Future<void> saveLoginAccountsData(String loginAccountsJson) async {
+    final loginAccountsData = await getLoginAccountsData();
+    if (loginAccountsData != null) {
+      /// 获取集合
+      final localLoginAccountListData = LoginAccountListData.fromJson(loginAccountsData);
+      /// 将新的账号添加到集合中
+      final newLoginAccountData = LoginAccountData.fromJson(loginAccountsJson);
+      localLoginAccountListData.loginDataList.add(newLoginAccountData);
+      /// 保存到本地
+      final newLocalLoginAccountListDataJson = localLoginAccountListData.toJson();
+      await SpUtil.saveStringData(loginAccountsDataKey, newLocalLoginAccountListDataJson);
+    } else {
+      final newLoginAccountData = LoginAccountData.fromJson(loginAccountsJson);
+      final newLoginAccountListData = LoginAccountListData(loginDataList: [newLoginAccountData]);
+      final newLoginAccountListDataJson = newLoginAccountListData.toJson();
+      await SpUtil.saveStringData(loginAccountsDataKey, newLoginAccountListDataJson);
+    }
+  }
 
   static Future<String?> getLoginData() async {
     return await SpUtil.getStringData(loginDataKey);

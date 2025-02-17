@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:vid_web/data/video_file_data.dart';
 import 'package:vid_web/data/web_page_data.dart';
 import 'package:vid_web/enum/home_list_block.dart';
+import 'package:vid_web/enum/support_vid_platform.dart';
 import 'package:vid_web/pages/dailymotion_page.dart';
 import 'package:vid_web/pages/home_page.dart';
 import 'package:vid_web/pages/login_page.dart';
@@ -23,6 +24,10 @@ class Routes {
   static const String settingPath = "/setting_page";
   static const String dataFolderListPath = "/data_folder_list_page";
   static const String dailymotionPagePath = "/upload_data_dailymotion_page";
+  static const String bilibiliPagePath = "/upload_data_bilibili_page";
+  static const String tiktokPagePath = "/upload_data_tiktok_page";
+  static const String youtubePagePath = "/upload_data_youtube_page";
+  static const String vimeoPagePath = "/upload_data_vimeo_page";
 
   static const String manageSettingsPagePath = "/manage_settings_page";
   static bool _initRoute = false;
@@ -93,6 +98,21 @@ class Routes {
     final encodedParam = Uri.encodeComponent(videoFileData.toJson());
     final path = '${Routes.shortDetailPath}?data=$encodedParam';
     Routes.router.navigateTo(context, path);
+  }
+
+  static void routeUploadPlatformPage(BuildContext context, SupportVidPlatform supportVidPlatform) {
+    final type = supportVidPlatform.type;
+    if(type == SupportVidPlatform.dailymotion.type) {
+      Routes.router.navigateTo(context, dailymotionPagePath);
+    } else if(type == SupportVidPlatform.youtube.type) {
+
+    } else if(type == SupportVidPlatform.tiktok.type) {
+
+    } else if(type == SupportVidPlatform.vimeo.type) {
+
+    } else if(type == SupportVidPlatform.bilibili.type) {
+
+    }
   }
 
 }

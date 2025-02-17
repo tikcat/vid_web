@@ -14,9 +14,10 @@ class GoogleSignInProvider extends ChangeNotifier {
   // 提供静态的 getter 来访问单例对象
   static GoogleSignInProvider get instance => _instance;
 
-  final googleSignIn = GoogleSignIn(
-      clientId: '997863883560-0rlhh2h7l33p9lfsov6a703nn0e3r7nb.apps.googleusercontent.com',
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+
+  final GoogleSignIn googleSignIn = GoogleSignIn(
+    clientId: '997863883560-0rlhh2h7l33p9lfsov6a703nn0e3r7nb.apps.googleusercontent.com',
+    scopes: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
   );
 
   GoogleSignInAccount? _user;

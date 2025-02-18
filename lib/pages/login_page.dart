@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:provider/provider.dart';
 import 'package:vid_web/constant/my_color.dart';
 import 'package:vid_web/data/login_account_data.dart';
@@ -9,7 +10,6 @@ import 'package:vid_web/data/login_data.dart';
 import 'package:vid_web/dialog/loading_dialog.dart';
 import 'package:vid_web/dialog/my_dialog.dart';
 import 'package:vid_web/manager/common_manager.dart';
-import 'package:vid_web/manager/fire_store_manager.dart';
 import 'package:vid_web/r.dart';
 import 'package:vid_web/routes.dart';
 import 'package:vid_web/size.dart';
@@ -18,6 +18,7 @@ import 'package:vid_web/store/login_page_store.dart';
 import 'package:vid_web/text_style.dart';
 import 'package:vid_web/util/image_loader.dart';
 import 'package:vid_web/util/toast_util.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -245,8 +246,6 @@ class _LoginPageState extends State<LoginPage> {
           LoadingDialog.showLoadingDialog(context);
           final User? user = await signInWithGoogle();
 
-
-
           if (user == null) {
             ToastUtil.showToast("登录失败");
             if (context.mounted) {
@@ -254,6 +253,7 @@ class _LoginPageState extends State<LoginPage> {
             }
             return;
           }
+          _loginPageStore.setUser(user);
           /// firebase登陆
           // final firebaseUser = await FireStoreManager.signInWithEmailPassword(_emailController?.text ?? "", _passwordController?.text ?? "");
 
@@ -308,11 +308,9 @@ class _LoginPageState extends State<LoginPage> {
   /// 通过Google的凭证登录
   Future<User?> signInWithGoogle() async {
     try {
-      // 启动 Google 登录
-      // final GoogleSignIn googleSignIn = GoogleSignIn();
       final GoogleSignIn googleSignIn = GoogleSignIn(
         clientId: '997863883560-0rlhh2h7l33p9lfsov6a703nn0e3r7nb.apps.googleusercontent.com',
-        scopes: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
+        scopes: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', drive.DriveApi.driveScope,],
       );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
@@ -320,7 +318,7 @@ class _LoginPageState extends State<LoginPage> {
         // 用户取消了登录
         return null;
       }
-      _dailymotionPageStore.setGoogleUser(googleUser);
+      _loginPageStore.setGoogleUser(googleUser);
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
       // 从 Google 用户令牌创建凭证
@@ -330,7 +328,7 @@ class _LoginPageState extends State<LoginPage> {
       // 使用 Firebase 登录
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       // 用户成功登录
-      debugPrint("用户登录成功: ${userCredential.user?.displayName}");
+      debugPrint("用户登录成功: ${userCredential.user?.displayName}  photo:${userCredential.user?.photoURL}");
       return userCredential.user;
     } catch (e) {
       debugPrint("Google 登录错误: $e");

@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobx/mobx.dart';
 import 'package:vid_web/data/login_account_data.dart';
 
@@ -21,5 +23,21 @@ abstract class _LoginPageStore with Store {
   @action
   void setLoginDataList(List<LoginAccountData> loginDataList) {
     this.loginDataList = loginDataList;
+  }
+
+  @observable
+  User? user;
+
+  @action
+  void setUser(User? user) {
+    this.user = user;
+  }
+
+  @observable
+  GoogleSignInAccount? googleUser;
+
+  @action
+  void setGoogleUser(GoogleSignInAccount? googleUser) {
+    this.googleUser = googleUser;
   }
 }

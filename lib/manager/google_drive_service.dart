@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -177,6 +178,14 @@ class GoogleDriveService {
       }
     }
     return null;
+  }
+
+  String? getFileId(String fileUrl) {
+    // https://drive.google.com/uc?id=1QaxF4mBkzOJkNiU2Ls4D813uaJH7PcV4&export=download
+    debugPrint("文件地址fileUrl:$fileUrl");
+    final fileId = fileUrl.substring(fileUrl.indexOf("id="), fileUrl.indexOf("&export"));
+    debugPrint("文件地址fileId:$fileId");
+    return fileId;
   }
 
   String? getDriveImageUrl(drive.File file) {

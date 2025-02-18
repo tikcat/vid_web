@@ -1,4 +1,3 @@
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobx/mobx.dart';
 import 'package:vid_web/data/video_file_data.dart';
 import 'package:vid_web/enum/home_list_block.dart';
@@ -8,14 +7,6 @@ part 'dailymotion_page_store.g.dart';
 class DailymotionPageStore = _DailymotionPageStore with _$DailymotionPageStore;
 
 abstract class _DailymotionPageStore with Store {
-
-  @observable
-  GoogleSignInAccount? googleUser;
-
-  @action
-  void setGoogleUser(GoogleSignInAccount? googleUser) {
-    this.googleUser = googleUser;
-  }
 
   /// 该集的名称
   @observable

@@ -41,6 +41,37 @@ mixin _$LoginPageStore on _LoginPageStore, Store {
     });
   }
 
+  late final _$userAtom = Atom(name: '_LoginPageStore.user', context: context);
+
+  @override
+  User? get user {
+    _$userAtom.reportRead();
+    return super.user;
+  }
+
+  @override
+  set user(User? value) {
+    _$userAtom.reportWrite(value, super.user, () {
+      super.user = value;
+    });
+  }
+
+  late final _$googleUserAtom =
+      Atom(name: '_LoginPageStore.googleUser', context: context);
+
+  @override
+  GoogleSignInAccount? get googleUser {
+    _$googleUserAtom.reportRead();
+    return super.googleUser;
+  }
+
+  @override
+  set googleUser(GoogleSignInAccount? value) {
+    _$googleUserAtom.reportWrite(value, super.googleUser, () {
+      super.googleUser = value;
+    });
+  }
+
   late final _$_LoginPageStoreActionController =
       ActionController(name: '_LoginPageStore', context: context);
 
@@ -67,10 +98,34 @@ mixin _$LoginPageStore on _LoginPageStore, Store {
   }
 
   @override
+  void setUser(User? user) {
+    final _$actionInfo = _$_LoginPageStoreActionController.startAction(
+        name: '_LoginPageStore.setUser');
+    try {
+      return super.setUser(user);
+    } finally {
+      _$_LoginPageStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setGoogleUser(GoogleSignInAccount? googleUser) {
+    final _$actionInfo = _$_LoginPageStoreActionController.startAction(
+        name: '_LoginPageStore.setGoogleUser');
+    try {
+      return super.setGoogleUser(googleUser);
+    } finally {
+      _$_LoginPageStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 currentAccount: ${currentAccount},
-loginDataList: ${loginDataList}
+loginDataList: ${loginDataList},
+user: ${user},
+googleUser: ${googleUser}
     ''';
   }
 }

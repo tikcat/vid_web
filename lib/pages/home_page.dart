@@ -8,6 +8,7 @@ import 'package:vid_web/size.dart';
 import 'package:vid_web/store/login_page_store.dart';
 import 'package:vid_web/text_style.dart';
 import 'package:vid_web/util/image_loader.dart';
+import 'package:vid_web/util/my_logger.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final loginPageStore = Provider.of<LoginPageStore>(context);
+    mLogger.d("用户的头像 :${loginPageStore.user?.photoURL}");
 
     return Scaffold(
       body: Container(
@@ -35,21 +37,24 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ImageLoader.loadNetImageCache(
-                      loginPageStore.user?.photoURL ?? "",
-                      width: 36,
-                      height: 36,
-                      ltCornerRadius: 20,
-                      rtCornerRadius: 20,
-                      lbCornerRadius: 20,
-                      rbCornerRadius: 20,
+                    Visibility(
+                      visible: loginPageStore.user?.photoURL?.isNotEmpty == true,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(5),
+                          topRight: Radius.circular(5),
+                          bottomLeft: Radius.circular(5),
+                          bottomRight: Radius.circular(5),
+                        ),
+                        child: Image.network(loginPageStore.user?.photoURL ?? "", width: 38, height: 38, fit: BoxFit.cover),
+                      ),
                     ),
                     w8,
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(loginPageStore.user?.displayName ?? "", style: MyTextStyle.textStyle600Weight(Colors.black, fontSize: 15)),
-                        h3,
+                        h1,
                         Text(loginPageStore.user?.email ?? "", style: MyTextStyle.textStyle500Weight(Colors.grey[850]!, fontSize: 12)),
                       ],
                     )

@@ -186,22 +186,6 @@ mixin _$DailymotionPageStore on _DailymotionPageStore, Store {
     });
   }
 
-  late final _$videoCoverAtom =
-      Atom(name: '_DailymotionPageStore.videoCover', context: context);
-
-  @override
-  String get videoCover {
-    _$videoCoverAtom.reportRead();
-    return super.videoCover;
-  }
-
-  @override
-  set videoCover(String value) {
-    _$videoCoverAtom.reportWrite(value, super.videoCover, () {
-      super.videoCover = value;
-    });
-  }
-
   late final _$showReadVideoJsonAtom =
       Atom(name: '_DailymotionPageStore.showReadVideoJson', context: context);
 
@@ -425,17 +409,6 @@ mixin _$DailymotionPageStore on _DailymotionPageStore, Store {
   }
 
   @override
-  void updateVideoCover(String value) {
-    final _$actionInfo = _$_DailymotionPageStoreActionController.startAction(
-        name: '_DailymotionPageStore.updateVideoCover');
-    try {
-      return super.updateVideoCover(value);
-    } finally {
-      _$_DailymotionPageStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void updateShowReadVideoJson(bool value) {
     final _$actionInfo = _$_DailymotionPageStoreActionController.startAction(
         name: '_DailymotionPageStore.updateShowReadVideoJson');
@@ -515,7 +488,6 @@ isFree: ${isFree},
 currentVideoFileLanguage: ${currentVideoFileLanguage},
 videoUploading: ${videoUploading},
 isUpload: ${isUpload},
-videoCover: ${videoCover},
 showReadVideoJson: ${showReadVideoJson},
 showUploadVideo: ${showUploadVideo},
 videoFileDataList: ${videoFileDataList},

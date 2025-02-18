@@ -196,4 +196,8 @@ class GoogleDriveService {
     }
     return null;
   }
+
+  String getImageUrl(String fileId) {
+    return "https://drive.google.com/uc?id=$fileId&export=download";
+  }
 }

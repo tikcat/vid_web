@@ -101,14 +101,6 @@ abstract class _DailymotionPageStore with Store {
   }
 
   @observable
-  String videoCover = "";
-
-  @action
-  void updateVideoCover(String value) {
-    videoCover = value;
-  }
-
-  @observable
   bool showReadVideoJson = false;
 
   @action
